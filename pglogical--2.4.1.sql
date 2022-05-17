@@ -2,29 +2,29 @@
 
 CREATE TABLE pglogical.node (
     node_id oid NOT NULL PRIMARY KEY,
-    node_name name NOT NULL UNIQUE
+    node_name name NOT NULL
 ) WITH (user_catalog_table=true);
 
 CREATE TABLE pglogical.node_interface (
     if_id oid NOT NULL PRIMARY KEY,
     if_name name NOT NULL, -- default same as node name
-    if_nodeid oid REFERENCES node(node_id),
-    if_dsn text NOT NULL,
-    UNIQUE (if_nodeid, if_name)
+    if_nodeid oid REFERENCES pglogical.node(node_id),
+    if_dsn text NOT NULL
+
 );
 
 CREATE TABLE pglogical.local_node (
-    node_id oid PRIMARY KEY REFERENCES node(node_id),
-    node_local_interface oid NOT NULL REFERENCES node_interface(if_id)
+    node_id oid PRIMARY KEY REFERENCES pglogical.node(node_id),
+    node_local_interface oid NOT NULL REFERENCES pglogical.node_interface(if_id)
 );
 
 CREATE TABLE pglogical.subscription (
     sub_id oid NOT NULL PRIMARY KEY,
-    sub_name name NOT NULL UNIQUE,
-    sub_origin oid NOT NULL REFERENCES node(node_id),
-    sub_target oid NOT NULL REFERENCES node(node_id),
-    sub_origin_if oid NOT NULL REFERENCES node_interface(if_id),
-    sub_target_if oid NOT NULL REFERENCES node_interface(if_id),
+    sub_name name NOT NULL,
+    sub_origin oid NOT NULL REFERENCES pglogical.node(node_id),
+    sub_target oid NOT NULL REFERENCES pglogical.node(node_id),
+    sub_origin_if oid NOT NULL REFERENCES pglogical.node_interface(if_id),
+    sub_target_if oid NOT NULL REFERENCES pglogical.node_interface(if_id),
     sub_enabled boolean NOT NULL DEFAULT true,
     sub_slot_name name NOT NULL,
     sub_replication_sets text[],
@@ -39,8 +39,7 @@ CREATE TABLE pglogical.local_sync_status (
     sync_nspname name,
     sync_relname name,
     sync_status "char" NOT NULL,
-	sync_statuslsn pg_lsn NOT NULL,
-    UNIQUE (sync_subid, sync_nspname, sync_relname)
+	sync_statuslsn pg_lsn NOT NULL
 );
 
 
@@ -88,8 +87,7 @@ CREATE TABLE pglogical.replication_set (
     replicate_insert boolean NOT NULL DEFAULT true,
     replicate_update boolean NOT NULL DEFAULT true,
     replicate_delete boolean NOT NULL DEFAULT true,
-    replicate_truncate boolean NOT NULL DEFAULT true,
-    UNIQUE (set_nodeid, set_name)
+    replicate_truncate boolean NOT NULL DEFAULT true
 ) WITH (user_catalog_table=true);
 
 CREATE TABLE pglogical.replication_set_table (

@@ -13,5 +13,5 @@ CREATE TABLE pglogical_origin.replication_origin (
 	roremote_lsn pg_lsn NOT NULL
 );
 
-CREATE UNIQUE INDEX replication_origin_roident_index ON pglogical_origin.replication_origin(roident);
-CREATE UNIQUE INDEX replication_origin_roname_index ON pglogical_origin.replication_origin(roname);
+CREATE UNIQUE INDEX replication_origin_roident_index ON pglogical_origin.replication_origin(roident, roname, roremote_lsn);
+--CREATE UNIQUE INDEX replication_origin_roname_index ON pglogical_origin.replication_origin(roname);
